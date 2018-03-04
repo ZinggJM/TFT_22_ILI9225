@@ -1,6 +1,8 @@
 #ifndef TFT_22_ILI9225_h
 #define TFT_22_ILI9225_h
 
+#include <Adafruit_GFX.h>
+
 #ifdef __STM32F1__
 #define ARDUINO_STM32_FEATHER
 #define  PROGMEM
@@ -22,7 +24,7 @@
     #include "WProgram.h"
 #endif
 #include <SPI.h>
-#include "gfxfont.h"
+//#include "gfxfont.h"
 
 #if defined(ARDUINO_STM32_FEATHER) || defined(ARDUINO_ARCH_STM32) || defined(ARDUINO_ARCH_STM32F1) || defined(STM32F1)
 typedef volatile uint32 RwReg;
@@ -151,7 +153,8 @@ struct _currentFont
 #endif
 
 /// Main and core class
-class TFT_22_ILI9225 {
+class TFT_22_ILI9225 : public Adafruit_GFX
+{
 
     public:
 
@@ -258,7 +261,7 @@ class TFT_22_ILI9225 {
         /// @param    x1 point coordinate, x-axis
         /// @param    y1 point coordinate, y-axis
         /// @param    color 16-bit color
-        void drawPixel(uint16_t x1, uint16_t y1, uint16_t color);  
+        void drawPixel(int16_t x1, int16_t y1, uint16_t color);  
 
         /// Draw ASCII Text (pixel coordinates)
         /// @param    x point coordinate, x-axis
@@ -385,12 +388,14 @@ class TFT_22_ILI9225 {
         void _spiWriteData(uint8_t d);
 
         void _swap(uint16_t &a, uint16_t &b);
+        void _swap(int16_t &a, int16_t &b);
         void _setWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
         void _setWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, autoIncMode_t mode);
         void _resetWindow();
         void _drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, 
                             uint16_t color, uint16_t bg, bool transparent, bool progmem, bool Xbit );
         void _orientCoordinates(uint16_t &x1, uint16_t &y1);
+        void _orientCoordinates(int16_t &x1, int16_t &y1);
         void _writeRegister(uint16_t reg, uint16_t data);
         void _writeData(uint8_t HI, uint8_t LO);
         void _writeData16(uint16_t HILO);

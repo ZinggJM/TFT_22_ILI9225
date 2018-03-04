@@ -183,7 +183,8 @@
 // #define SPI_WRITE_PIXELS(c,l)   if(_clk < 0){HSPI_WRITE_PIXELS(c,l);}else{SSPI_WRITE_PIXELS(c,l);}
 
 // Constructor when using software SPI.  All output pins are configurable.
-TFT_22_ILI9225::TFT_22_ILI9225(int8_t rst, int8_t rs, int8_t cs, int8_t sdi, int8_t clk, int8_t led) {
+TFT_22_ILI9225::TFT_22_ILI9225(int8_t rst, int8_t rs, int8_t cs, int8_t sdi, int8_t clk, int8_t led) : Adafruit_GFX(ILI9225_LCD_WIDTH, ILI9225_LCD_HEIGHT)
+{
     _rst  = rst;
     _rs   = rs;
     _cs   = cs;
@@ -197,7 +198,8 @@ TFT_22_ILI9225::TFT_22_ILI9225(int8_t rst, int8_t rs, int8_t cs, int8_t sdi, int
 }
 
 // Constructor when using software SPI.  All output pins are configurable. Adds backlight brightness 0-255
-TFT_22_ILI9225::TFT_22_ILI9225(int8_t rst, int8_t rs, int8_t cs, int8_t sdi, int8_t clk, int8_t led, uint8_t brightness) {
+TFT_22_ILI9225::TFT_22_ILI9225(int8_t rst, int8_t rs, int8_t cs, int8_t sdi, int8_t clk, int8_t led, uint8_t brightness)  : Adafruit_GFX(ILI9225_LCD_WIDTH, ILI9225_LCD_HEIGHT)
+{
     _rst  = rst;
     _rs   = rs;
     _cs   = cs;
@@ -212,7 +214,8 @@ TFT_22_ILI9225::TFT_22_ILI9225(int8_t rst, int8_t rs, int8_t cs, int8_t sdi, int
 
 // Constructor when using hardware SPI.  Faster, but must use SPI pins
 // specific to each board type (e.g. 11,13 for Uno, 51,52 for Mega, etc.)
-TFT_22_ILI9225::TFT_22_ILI9225(int8_t rst, int8_t rs, int8_t cs, int8_t led) {
+TFT_22_ILI9225::TFT_22_ILI9225(int8_t rst, int8_t rs, int8_t cs, int8_t led)  : Adafruit_GFX(ILI9225_LCD_WIDTH, ILI9225_LCD_HEIGHT)
+{
     _rst  = rst;
     _rs   = rs;
     _cs   = cs;
@@ -227,7 +230,8 @@ TFT_22_ILI9225::TFT_22_ILI9225(int8_t rst, int8_t rs, int8_t cs, int8_t led) {
 // Constructor when using hardware SPI.  Faster, but must use SPI pins
 // specific to each board type (e.g. 11,13 for Uno, 51,52 for Mega, etc.)
 // Adds backlight brightness 0-255
-TFT_22_ILI9225::TFT_22_ILI9225(int8_t rst, int8_t rs, int8_t cs, int8_t led, uint8_t brightness) {
+TFT_22_ILI9225::TFT_22_ILI9225(int8_t rst, int8_t rs, int8_t cs, int8_t led, uint8_t brightness)  : Adafruit_GFX(ILI9225_LCD_WIDTH, ILI9225_LCD_HEIGHT)
+{
     _rst  = rst;
     _rs   = rs;
     _cs   = cs;
@@ -422,6 +426,26 @@ void TFT_22_ILI9225::_spiWriteData(uint8_t c) {
 }
 
 void TFT_22_ILI9225::_orientCoordinates(uint16_t &x1, uint16_t &y1) {
+
+    switch (_orientation) {
+    case 0:  // ok
+        break;
+    case 1: // ok
+        y1 = _maxY - y1 - 1;
+        _swap(x1, y1);
+        break;
+    case 2: // ok
+        x1 = _maxX - x1 - 1;
+        y1 = _maxY - y1 - 1;
+        break;
+    case 3: // ok
+        x1 = _maxX - x1 - 1;
+        _swap(x1, y1);
+        break;
+    }
+}
+
+void TFT_22_ILI9225::_orientCoordinates(int16_t &x1, int16_t &y1) {
 
     switch (_orientation) {
     case 0:  // ok
@@ -732,7 +756,7 @@ void TFT_22_ILI9225::drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2
 }
 
 
-void TFT_22_ILI9225::drawPixel(uint16_t x1, uint16_t y1, uint16_t color) {
+void TFT_22_ILI9225::drawPixel(int16_t x1, int16_t y1, uint16_t color) {
 
     if((x1 >= _maxX) || (y1 >= _maxY)) return;
 /*
@@ -781,6 +805,12 @@ void TFT_22_ILI9225::splitColor(uint16_t rgb, uint8_t &red, uint8_t &green, uint
 
 
 void TFT_22_ILI9225::_swap(uint16_t &a, uint16_t &b) {
+    uint16_t w = a;
+    a = b;
+    b = w;
+}
+
+void TFT_22_ILI9225::_swap(int16_t &a, int16_t &b) {
     uint16_t w = a;
     a = b;
     b = w;
